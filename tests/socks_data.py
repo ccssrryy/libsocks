@@ -1,0 +1,4 @@
+proxy_ip = "172.217.24.14"
+proxy_port = 80
+socks5_no_auth_resp = [b'\x05\x00',b'\x05\x00\x00', b'\x01',b'\x00\x00\x00\x00', b'\x06\xb5']
+socks4_resp = [b'\x00Z\x00\x00\x00\x00\x00\x00']
