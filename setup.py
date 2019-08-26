@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import os
 import re
@@ -25,7 +25,7 @@ setup(
     license="BSD",
     author="ccssrryy",
     author_email="cs010@hotmail.com",
-    keywords=["http", "socks", "proxy"],
+    keywords=["socks", "socks5", "socks4", "asyncio", "proxy"],
     include_package_data=True,
     packages=find_packages(include=[
         "libsocks", "libsocks.*"

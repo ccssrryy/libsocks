@@ -17,6 +17,7 @@ class TestSocks(unittest.TestCase):
             return next(resp)
         async def async_send(d):
             req_data.append(d)
+            return len(d)
         task = async_process(context, async_recv, async_send)
         self.loop.run_until_complete(task)
 
