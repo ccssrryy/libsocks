@@ -56,7 +56,11 @@ class BaseContext(Actions):
         self.password = password
         self.cmd = cmd
         self._state = None
-        self.addr_bytes = socket.inet_pton(socket.AF_INET, self.dst_addr)  # type: bytes
+        if atyp == constants.ATYP_DOMAINNAME:
+            self.addr_bytes = bytes(self.dst_addr, "utf8")
+        else:
+            self.addr_bytes = socket.inet_pton(socket.AF_INET if atyp == constants.ATYP_IPV4 else socket.AF_INET6,
+                                               self.dst_addr)  # type: bytes
         self.port_bytes = struct.pack(">H", dst_port)  # type: bytes
 
     @gen

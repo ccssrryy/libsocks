@@ -39,6 +39,8 @@ class Socks5CmdState(BaseState):
         req = bytearray()
         req.extend([self.context.ver, self.context.cmd, constants.RSV,
                     self.context.atyp])
+        if self.context.atyp == constants.ATYP_DOMAINNAME:
+            req.append(len(self.context.addr_bytes))
         req.extend(self.context.addr_bytes)
         req.extend(self.context.port_bytes)
         yield Request(req)
@@ -86,8 +88,8 @@ class Socks5UsrPwdSelectState(BaseState):
             auth_req.append(1)  # VER
             auth_req.append(len(self.context.username))
             auth_req.extend(bytes(self.context.username, "utf8"))
-            auth_req.append(len(self.context.username))
-            auth_req.extend(bytes(self.context.username, "utf8"))
+            auth_req.append(len(self.context.password))
+            auth_req.extend(bytes(self.context.password, "utf8"))
             yield Request(auth_req)
             _, status = yield Response(2)
             if status != 0:
