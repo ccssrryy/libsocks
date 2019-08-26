@@ -69,6 +69,10 @@ class AddrNotSupportError(BaseSocksError):
 class UnkownError(BaseSocksError):
     pass
 
+
+class AuthError(BaseSocksError):
+    msg = "auth fail"
+
 code_map = {
     constants.REP_FAILURE: ServerFailError(),
     constants.REP_NOT_ALLOWED: NotAllowedError(),

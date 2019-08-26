@@ -3,7 +3,7 @@ import struct
 
 from libsocks.core import constants
 from libsocks.core.decorators import gen
-from libsocks.core.exceptions import SocksError, socks5_raise_from_code
+from libsocks.core.exceptions import SocksError, socks5_raise_from_code, AuthError
 from libsocks.core.impl import BaseState, Request, Response, AddrPort, HandshakeDoneState
 
 
@@ -26,11 +26,10 @@ class Socks5NoAuthSelectState(BaseState):
         req.extend([self.context.ver, 1, constants.METHOD_NO_AUTH])
         yield Request(req)
         ver, method = yield Response(2)
-        if method == 0xFF:
-            raise SocksError("error response when method select")
-        if method == constants.METHOD_NO_AUTH:
-            self.set_state(Socks5CmdState(self.context))
-            yield from self.context.handle()
+        if method != constants.METHOD_NO_AUTH:
+            raise SocksError("no acceptable methods")
+        self.set_state(Socks5CmdState(self.context))
+        yield from self.context.handle()
 
 
 class Socks5CmdState(BaseState):
@@ -69,6 +68,31 @@ class Socks5UsrPwdSelectState(BaseState):
 
     @gen
     def handle(self):
-        pass
+        """
+           +----+------+----------+------+----------+
+           |VER | ULEN |  UNAME   | PLEN |  PASSWD  |
+           +----+------+----------+------+----------+
+           | 1  |  1   | 1 to 255 |  1   | 1 to 255 |
+           +----+------+----------+------+----------+
+        """
+        req = bytearray()
+        req.extend([self.context.ver, 2, constants.METHOD_USERNAME_PASSWORD])
+        yield Request(req)
+        ver, method = yield Response(2)
+        if method not in [constants.METHOD_NO_AUTH, constants.METHOD_USERNAME_PASSWORD]:
+            raise SocksError("no acceptable methods")
+        if method == constants.METHOD_USERNAME_PASSWORD:
+            auth_req = bytearray()
+            auth_req.append(1)  # VER
+            auth_req.append(len(self.context.username))
+            auth_req.extend(bytes(self.context.username, "utf8"))
+            auth_req.append(len(self.context.username))
+            auth_req.extend(bytes(self.context.username, "utf8"))
+            yield Request(auth_req)
+            _, status = yield Response(2)
+            if status != 0:
+                raise AuthError()
+        self.set_state(Socks5CmdState(self.context))
+        yield from self.context.handle()
 
 
