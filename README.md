@@ -1,6 +1,6 @@
 # libsocks
 
-a socks5/socks/http proxy client module, easy to work with your code
+a socks5/socks proxy client module, easy to work with your code
 
 # Feature
 
