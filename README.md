@@ -100,4 +100,4 @@ if __name__ == "__main__":
 
 # License
 
-BSD
+MIT
